@@ -1,0 +1,84 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: db-postgres
+    image: postgres:17.4
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  web:
+    container_name: django
+    build:
+      context: ./django-docker
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./django-docker:/app
+      - ./django-docker/media:/app/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    env_file: .env
+
+  redis:
+    container_name: redis
+    image: redis:7.0.11-alpine
+    ports:
+      - "6379:6379"
+
+  celery:
+    container_name: celery
+    build:
+      context: ./django-docker
+    command: celery --app=store worker -l INFO
+    volumes:
+      - ./django-docker:/app
+    working_dir: /app
+    env_file: .env
+    depends_on:
+      - redis
+
+  celery-beat:
+    container_name: celery-beat
+    build:
+      context: ./django-docker
+    command: celery -A store beat -l info
+    env_file: .env
+    volumes:
+      - ./django-docker:/app
+    working_dir: /app
+    depends_on:
+      - redis
+
+  flower:
+    container_name: flower
+    build:
+      context: ./django-docker
+    command: celery -A store flower --port=5555 --broker=${CELERY_BROKER_REDIS}
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./django-docker:/app
+    working_dir: /app
+    env_file: .env
+    depends_on:
+      - redis
+
+  notification:
+    container_name: notification
+    build:
+      context: ./notification_service
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+
+volumes:
+  pgdata:
+  media_volume:

@@ -1,0 +1,57 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+*.sqlite3-journal
+*.log
+*.pid
+*.swp
+*.bak
+*.~*
+
+# Local settings
+local_settings.py
+settings_local.py
+
+# Virtual environment
+django-docker/venv/
+env/
+.venv/
+../.env/
+
+# pyenv
+.python-version
+
+# IDEs
+.idea/
+
+# Coverage reports
+.coverage
+.coverage.*
+*.hypothesis/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Django static files
+/static/
+
+# Django migrations
+*/migrations/
+
+# Django secret key file (if any)
+.secret_key/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+
+../.env
