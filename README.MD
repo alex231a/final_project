@@ -52,8 +52,6 @@ CELERY_BROKER_REDIS=redis://redis:6379/0
 
 3. Build & Run
 bash
-Копіювати
-Редагувати
 docker-compose up --build
 
 🔗 Available URLs
